@@ -3,8 +3,40 @@
  */
 package stocksmonitor;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import org.json.JSONObject;
+
+
 public class App {
+
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        System.out.println("Hello World!");  
+        var client = HttpClient.newHttpClient();
+
+        var request = HttpRequest.newBuilder(
+                 URI.create("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY")
+        )
+        .header("accept", "application/json")
+        .build();
+
+        HttpResponse<String> response;
+        try {
+          response = client.send(request, HttpResponse.BodyHandlers.ofString());
+          System.out.println(response.body());
+          JSONObject jsonObject = new JSONObject(response.body());
+          var a = jsonObject.get("date");
+          System.out.println(a);
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+
+
     }
 }
