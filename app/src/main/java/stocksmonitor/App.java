@@ -18,8 +18,11 @@ public class App {
         System.out.println("Hello World!");  
         var client = HttpClient.newHttpClient();
 
+        String apiKey = "key";
+        String symbol = "IBM";
+
         var request = HttpRequest.newBuilder(
-                 URI.create("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY")
+                 URI.create("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM" + symbol + "&apikey="+apiKey)
         )
         .header("accept", "application/json")
         .build();
@@ -27,9 +30,11 @@ public class App {
         HttpResponse<String> response;
         try {
           response = client.send(request, HttpResponse.BodyHandlers.ofString());
-          System.out.println(response.body());
           JSONObject jsonObject = new JSONObject(response.body());
-          var a = jsonObject.get("date");
+
+          JSONObject stockData = jsonObject.getJSONObject("Global Quote");
+
+          var a = stockData.get("05. price");
           System.out.println(a);
         } catch (IOException e) {
           e.printStackTrace();
