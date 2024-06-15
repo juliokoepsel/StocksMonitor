@@ -9,39 +9,68 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-
 
 public class App {
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");  
-        var client = HttpClient.newHttpClient();
+  public static void main(String[] args) {
+    var client = HttpClient.newHttpClient();
 
-        String apiKey = "key";
-        String symbol = "IBM";
+    String[] symbols = { "MGLU3", "PETR4", "RRRP3", "BBAS3" };
 
-        var request = HttpRequest.newBuilder(
-                 URI.create("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM" + symbol + "&apikey="+apiKey)
-        )
-        .header("accept", "application/json")
-        .build();
+    String apiKey = "";
+    long begin = System.currentTimeMillis();
 
-        HttpResponse<String> response;
-        try {
-          response = client.send(request, HttpResponse.BodyHandlers.ofString());
-          JSONObject jsonObject = new JSONObject(response.body());
+    for (String symbol : symbols) {
+      var request = HttpRequest.newBuilder(
+          URI.create(
+              "https://brapi.dev/api/quote/" + symbol + "?token=" + apiKey))
+          .header("accept", "application/json")
+          .build();
 
-          JSONObject stockData = jsonObject.getJSONObject("Global Quote");
+      HttpResponse<String> response;
+      try {
+        System.out.println(symbol);
 
-          var a = stockData.get("05. price");
-          System.out.println(a);
-        } catch (IOException e) {
-          e.printStackTrace();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JSONObject jsonObject = new JSONObject(response.body());
 
-
+        JSONArray stockData = jsonObject.getJSONArray("results");
+        var a = stockData.getJSONObject(0).get("regularMarketPrice");
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
+    long end = System.currentTimeMillis();
+
+    long time = end - begin;
+    System.out.println();
+    System.out.println("Elapsed Time: " + time + " milli seconds");
+
+    begin = System.currentTimeMillis();
+
+    Thread[] threads = new Thread[symbols.length];
+
+    for (int i = 0; i < symbols.length; i++) {
+      Thread t = new Thread(new Symbol(symbols[i]));
+      threads[i] = t;
+      t.start();
+    }
+
+    try {
+      for (Thread thread : threads) {
+        thread.join();
+      }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    end = System.currentTimeMillis();
+    time = end - begin;
+    System.out.println();
+    System.out.println("Elapsed Time: " + time + " milli seconds");
+  }
 }
