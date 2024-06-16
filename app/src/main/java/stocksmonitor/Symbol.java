@@ -21,7 +21,7 @@ public class Symbol implements Runnable {
   @Override
   public void run() {
     var client = HttpClient.newHttpClient();
-    String apiKey = "8rjhJTyD7iDwg4NBKqBKNM";
+    String apiKey = "";
 
     var request = HttpRequest.newBuilder(
         URI.create(
