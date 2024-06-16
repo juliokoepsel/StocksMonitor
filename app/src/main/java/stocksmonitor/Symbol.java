@@ -7,18 +7,21 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 public class Symbol implements Runnable {
   private String symbol;
+  Map<String, Float> prices;
 
-  public Symbol(String symbol) {
+  public Symbol(String symbol, Map<String, Float> prices) {
     this.symbol = symbol;
+    this.prices = prices;
   }
 
   @Override
   public void run() {
     var client = HttpClient.newHttpClient();
-    String apiKey = "";
+    String apiKey = "8rjhJTyD7iDwg4NBKqBKNM";
 
     var request = HttpRequest.newBuilder(
         URI.create(
@@ -28,13 +31,16 @@ public class Symbol implements Runnable {
 
     HttpResponse<String> response;
     try {
-      System.out.println(symbol);
+      System.out.println("Início da busca: " + symbol);
 
       response = client.send(request, HttpResponse.BodyHandlers.ofString());
       JSONObject jsonObject = new JSONObject(response.body());
 
       JSONArray stockData = jsonObject.getJSONArray("results");
-      var a = stockData.getJSONObject(0).get("regularMarketPrice");
+      float price = stockData.getJSONObject(0).getFloat("regularMarketPrice");
+      prices.put(symbol, price);
+      System.out.println("Fim da busca: " + symbol);
+
     } catch (IOException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

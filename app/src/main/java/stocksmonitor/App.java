@@ -3,74 +3,30 @@
  */
 package stocksmonitor;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class App {
 
   public static void main(String[] args) {
-    var client = HttpClient.newHttpClient();
-
     String[] symbols = { "MGLU3", "PETR4", "RRRP3", "BBAS3" };
 
-    String apiKey = "";
-    long begin = System.currentTimeMillis();
+    Timer timer = new Timer();
 
-    for (String symbol : symbols) {
-      var request = HttpRequest.newBuilder(
-          URI.create(
-              "https://brapi.dev/api/quote/" + symbol + "?token=" + apiKey))
-          .header("accept", "application/json")
-          .build();
+    Map<String, Float> stockPrices = new HashMap<>();
 
-      HttpResponse<String> response;
-      try {
-        System.out.println(symbol);
+    int scheduleTimeout = 30000;
 
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONObject jsonObject = new JSONObject(response.body());
+    TimerTask task = new TimerTask() {
+    public void run() {
+      System.out.println("Execução do scheduler");
+      StockPriceSearcher searcher = new StockPriceSearcher(symbols, stockPrices);
 
-        JSONArray stockData = jsonObject.getJSONArray("results");
-        var a = stockData.getJSONObject(0).get("regularMarketPrice");
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+      searcher.updateStockPrices();
     }
-    long end = System.currentTimeMillis();
-
-    long time = end - begin;
-    System.out.println();
-    System.out.println("Elapsed Time: " + time + " milli seconds");
-
-    begin = System.currentTimeMillis();
-
-    Thread[] threads = new Thread[symbols.length];
-
-    for (int i = 0; i < symbols.length; i++) {
-      Thread t = new Thread(new Symbol(symbols[i]));
-      threads[i] = t;
-      t.start();
-    }
-
-    try {
-      for (Thread thread : threads) {
-        thread.join();
-      }
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
-    end = System.currentTimeMillis();
-    time = end - begin;
-    System.out.println();
-    System.out.println("Elapsed Time: " + time + " milli seconds");
+};
+    timer.scheduleAtFixedRate(task, 0, scheduleTimeout);
   }
 }
