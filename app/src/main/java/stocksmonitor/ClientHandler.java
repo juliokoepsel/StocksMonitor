@@ -1,4 +1,4 @@
-package TestBackend;
+package stocksmonitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,8 +21,8 @@ public class ClientHandler implements Runnable {
         ) {
             String message;
             while ((message = in.readLine()) != null) {
-                System.out.println("Received: " + message);
-                out.println("Echo: " + message);
+                System.out.println("Recebido: " + message);
+                out.println("Eco: " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();
