@@ -10,41 +10,41 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 
 public class Symbol implements Runnable {
-  private String symbol;
-  Map<String, Float> prices;
+    private String symbol;
+    private Map<String, Float> prices;
 
-  public Symbol(String symbol, Map<String, Float> prices) {
-    this.symbol = symbol;
-    this.prices = prices;
-  }
-
-  @Override
-  public void run() {
-    var client = HttpClient.newHttpClient();
-    String apiKey = "";
-
-    var request = HttpRequest.newBuilder(
-        URI.create(
-            "https://brapi.dev/api/quote/" + symbol + "?token=" + apiKey))
-        .header("accept", "application/json")
-        .build();
-
-    HttpResponse<String> response;
-    try {
-      System.out.println("Início da busca: " + symbol);
-
-      response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      JSONObject jsonObject = new JSONObject(response.body());
-
-      JSONArray stockData = jsonObject.getJSONArray("results");
-      float price = stockData.getJSONObject(0).getFloat("regularMarketPrice");
-      prices.put(symbol, price);
-      System.out.println("Fim da busca: " + symbol);
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    public Symbol(String symbol, Map<String, Float> prices) {
+        this.symbol = symbol;
+        this.prices = prices;
     }
-  }
+
+    @Override
+    public void run() {
+        HttpClient client = HttpClient.newHttpClient();
+        String apiKey = "";
+
+        HttpRequest request = HttpRequest.newBuilder(
+            URI.create(
+                "https://brapi.dev/api/quote/" + symbol + "?token=" + apiKey))
+            .header("accept", "application/json")
+            .build();
+
+        HttpResponse<String> response;
+        try {
+            System.out.println("Início da busca: " + symbol);
+
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jsonObject = new JSONObject(response.body());
+
+            JSONArray stockData = jsonObject.getJSONArray("results");
+            float price = stockData.getJSONObject(0).getFloat("regularMarketPrice");
+            prices.put(symbol, price);
+            System.out.println("Fim da busca: " + symbol);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

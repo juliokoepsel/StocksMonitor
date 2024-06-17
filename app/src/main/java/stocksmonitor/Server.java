@@ -1,4 +1,4 @@
-package TestBackend;
+package stocksmonitor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MultiThreadedServer {
+public class Server {
     private static final int PORT = 12345;// Define port in a text file
     private static final int THREAD_POOL_SIZE = 10;
 
@@ -15,11 +15,11 @@ public class MultiThreadedServer {
         ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server is listening on port " + PORT);
+            System.out.println("O servidor está escutando no port " + PORT);
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected");
+                System.out.println("Novo cliente conectado");
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 threadPool.execute(clientHandler);
             }
