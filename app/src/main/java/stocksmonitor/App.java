@@ -3,8 +3,30 @@
  */
 package stocksmonitor;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class App {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+
+  public static void main(String[] args) {
+    String[] symbols = { "MGLU3", "PETR4", "RRRP3", "BBAS3" };
+
+    Timer timer = new Timer();
+
+    Map<String, Float> stockPrices = new HashMap<>();
+
+    int scheduleTimeout = 30000;
+
+    TimerTask task = new TimerTask() {
+    public void run() {
+      System.out.println("Execução do scheduler");
+      StockPriceSearcher searcher = new StockPriceSearcher(symbols, stockPrices);
+
+      searcher.updateStockPrices();
     }
+};
+    timer.scheduleAtFixedRate(task, 0, scheduleTimeout);
+  }
 }
