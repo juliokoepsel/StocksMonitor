@@ -31,5 +31,4 @@ public class StockPriceSearcher {
         }
         System.out.println("Fim da atualização de valores");
     }
-    
 }

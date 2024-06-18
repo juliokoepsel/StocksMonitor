@@ -3,6 +3,10 @@ package stocksmonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,7 +26,22 @@ public class Symbol implements Runnable {
     @Override
     public void run() {
         HttpClient client = HttpClient.newHttpClient();
-        String apiKey = "nC1nS5KZeUMqFxu2h8hFXG";
+        String apiKey = "";
+        String fileName = "apikey.txt";
+        File file = new File(fileName);
+        if (file.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                String line = br.readLine();
+                if (line != null) {
+                    apiKey = line;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Erro de leitura: Erro ao ler " + fileName);
+            }
+        } else {
+            System.err.println("API KEY não foi encontrada!");
+        }
 
         HttpRequest request = HttpRequest.newBuilder(
                 URI.create(

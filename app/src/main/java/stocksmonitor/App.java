@@ -176,7 +176,11 @@ public class App extends JFrame {
             for (int i = 0; i < existingElements.size(); i++) {
                 writer.write(existingElements.get(i));
                 writer.write(",");
-                writer.write(existingValues.get(i).toString());
+                if (existingValues.get(i) != null) {
+                    writer.write(existingValues.get(i).toString());
+                } else {
+                    writer.write("0.0");
+                }
                 writer.write("\n");
             }
             writer.close();
@@ -246,7 +250,11 @@ public class App extends JFrame {
                     String[] columns = line.split(",");
                     if (columns.length == 2) {
                         existingElements.add(columns[0]);
-                        existingValues.add(Float.parseFloat(columns[1]));
+                        if (columns[1] != null) {
+                            existingValues.add(Float.parseFloat(columns[1]));
+                        } else {
+                            existingValues.add(0.0f);
+                        }
                     }
                 }
                 System.out.println("(" + fileName + "): Leitura concluída!");
@@ -311,6 +319,5 @@ public class App extends JFrame {
                 timer.schedule(task, 0, 60000);
             }
         });
-
     }
 }
